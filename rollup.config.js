@@ -51,7 +51,6 @@ const plugins = [
   copy2({
     assets: [
       'LICENSE',
-      ['node_modules/leaflet/dist/images/layers.png', 'images/layers.png'],
     ],
   }),
 ]
