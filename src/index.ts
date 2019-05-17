@@ -12,11 +12,11 @@ import './index.css'
 
 const center: L.LatLngTuple = [65.534, 72.941]
 const minZoom = 5
-const maxZoom = 14
+const maxZoom = 16
 const zoom = 7
 const maxBounds: L.LatLngBoundsLiteral = [
-  [63.77393131014897, 69.23632868674484],
-  [67.29398120986096, 76.64595756645700]
+  [62.77393131014897, 68.23632868674484],
+  [68.29398120986096, 77.64595756645700]
 ]
 
 const imageLayer = L.tileLayer('corona/{z}/{x}/{y}.png', {
