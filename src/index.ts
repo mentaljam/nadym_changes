@@ -14,13 +14,11 @@ const center: L.LatLngTuple = [65.534, 72.941]
 const minZoom = 5
 const maxZoom = 16
 const zoom = 7
-const maxBounds: L.LatLngBoundsLiteral = [
-  [62.77393131014897, 68.23632868674484],
-  [68.29398120986096, 77.64595756645700]
-]
+const maxBounds: L.LatLngBoundsLiteral = MAX_BOUNDS
 
 const imageLayer = L.tileLayer('corona/{z}/{x}/{y}.jpg', {
-  attribution: 'Corona KH-4 21.08.1968'
+  attribution: 'Corona KH-4 21.08.1968',
+  bounds: CORONA_BOUNDS,
 })
 
 const imageMap = L.map('image-map', {

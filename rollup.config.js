@@ -12,6 +12,8 @@ import tslint from 'rollup-plugin-tslint'
 import typescript2 from 'rollup-plugin-typescript2'
 import svgToMiniDataURI from 'mini-svg-data-uri'
 
+import coronaBounds from './corona_bounds'
+
 
 const prodMode = process.env.NODE_ENV === 'production'
 
@@ -25,12 +27,19 @@ const readKey = (file) => {
 const yandexKey = readKey('yandex.txt')
 const bingKey = readKey('bing.txt')
 const crossSVG = svgToMiniDataURI(fs.readFileSync('src/cross.svg').toString())
+// Add one degree to every side of the Corona layer
+const maxBounds = [
+  coronaBounds[0].map(c => c - 1),
+  coronaBounds[1].map(c => c + 1),
+]
 
 
 const plugins = [
   replace({
     BING_KEY: JSON.stringify(bingKey),
     CROSS_SVG: JSON.stringify(crossSVG),
+    CORONA_BOUNDS: JSON.stringify(coronaBounds),
+    MAX_BOUNDS: JSON.stringify(maxBounds),
   }),
   resolve(),
   commonjs(),

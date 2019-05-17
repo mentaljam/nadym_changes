@@ -31,4 +31,5 @@ declare namespace L {
 
 declare const BING_KEY: string
 declare const CROSS_SVG: string
-
+declare const CORONA_BOUNDS: L.LatLngBoundsLiteral
+declare const MAX_BOUNDS: L.LatLngBoundsLiteral
