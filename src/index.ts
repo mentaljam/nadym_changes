@@ -19,7 +19,7 @@ const maxBounds: L.LatLngBoundsLiteral = [
   [68.29398120986096, 77.64595756645700]
 ]
 
-const imageLayer = L.tileLayer('corona/{z}/{x}/{y}.png', {
+const imageLayer = L.tileLayer('corona/{z}/{x}/{y}.jpg', {
   attribution: 'Corona KH-4 21.08.1968'
 })
 
