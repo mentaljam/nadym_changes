@@ -4,7 +4,7 @@ import 'leaflet-plugins/layer/tile/Bing.js'
 import 'leaflet-plugins/layer/tile/Yandex.js'
 import 'leaflet.sync'
 
-import Cross from './cross'
+import CrossSVG from './cross.svg'
 
 import 'leaflet/dist/leaflet.css'
 
@@ -30,8 +30,6 @@ const imageMap = L.map('image-map', {
   maxBounds,
 })
 
-imageMap.addControl(new Cross())
-
 const gfwLayer = new L.TileLayer(
   'https://storage.googleapis.com/earthenginepartners-hansen/tiles/gfc_v1.6/loss_tree_gain/{z}/{x}/{y}.png', {
     maxNativeZoom: 12,
@@ -54,11 +52,14 @@ const baseMap = L.map('base-map', {
   maxBounds,
 })
 
-baseMap
-  .addControl(new Cross())
-  .addControl(L.control.layers(baseLayers, undefined, {
-    collapsed: false,
-  }))
+baseMap.addControl(L.control.layers(baseLayers, undefined, {
+  collapsed: false,
+}))
+
+const crossContainers = document.getElementsByClassName('nc-cross')
+for (const cc of crossContainers) {
+  cc.innerHTML = CrossSVG
+}
 
 imageMap.sync(baseMap)
 baseMap.sync(imageMap)

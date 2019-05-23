@@ -10,7 +10,7 @@ import replace from 'rollup-plugin-replace'
 import resolve from 'rollup-plugin-node-resolve'
 import tslint from 'rollup-plugin-tslint'
 import typescript2 from 'rollup-plugin-typescript2'
-import svgToMiniDataURI from 'mini-svg-data-uri'
+import svgo from 'rollup-plugin-svgo'
 
 import coronaBounds from './corona_bounds'
 
@@ -26,7 +26,6 @@ const readKey = (file) => {
 
 const yandexKey = readKey('yandex.txt')
 const bingKey = readKey('bing.txt')
-const crossSVG = svgToMiniDataURI(fs.readFileSync('src/cross.svg').toString())
 // Add one degree to every side of the Corona layer
 const maxBounds = [
   coronaBounds[0].map(c => c - 1),
@@ -37,7 +36,6 @@ const maxBounds = [
 const plugins = [
   replace({
     BING_KEY: JSON.stringify(bingKey),
-    CROSS_SVG: JSON.stringify(crossSVG),
     CORONA_BOUNDS: JSON.stringify(coronaBounds),
     MAX_BOUNDS: JSON.stringify(maxBounds),
   }),
@@ -61,6 +59,9 @@ const plugins = [
       collapseWhitespace: true,
       keepClosingSlash: true,
     },
+  }),
+  svgo({
+    removeDimensions: false,
   }),
   copy2({
     assets: [
