@@ -32,13 +32,20 @@ const imageMap = L.map('image-map', {
 
 imageMap.addControl(new Cross())
 
+const gfwLayer = new L.TileLayer(
+  'https://storage.googleapis.com/earthenginepartners-hansen/tiles/gfc_v1.6/loss_tree_gain/{z}/{x}/{y}.png', {
+    maxNativeZoom: 12,
+    attribution: '&copy; <a href="http://www.glad.umd.edu/">Hansen/UMD/Google/USGS/NASA</a>',
+  })
+
 const baseLayers = {
   'Bing Maps': new L.BingLayer(BING_KEY, {type: 'AerialWithLabels'}),
   'Yandex.Maps': new L.Yandex('hybrid'),
+  'Global Forest Watch<br/>Loss/Extent/Gain<br/>(Red/Green/Blue)': gfwLayer,
 }
 
 const baseMap = L.map('base-map', {
-  layers: [baseLayers['Yandex.Maps']],
+  layers: [gfwLayer],
   center,
   minZoom,
   maxZoom,
