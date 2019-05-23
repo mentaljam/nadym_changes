@@ -4,10 +4,20 @@ html, body {
   margin: 0;
 }
 
+body {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+
 .nc-map {
-  width: 49.5%;
-  height: 100%;
+  flex: 1;
   position: relative;
+}
+
+.nc-margin {
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .nc-map > div {
@@ -16,14 +26,6 @@ html, body {
   position: absolute;
   top: 0;
   left: 0;
-}
-
-.nc-image {
-  float: left;
-}
-
-.nc-base {
-  float: right;
 }
 
 .nc-cross {

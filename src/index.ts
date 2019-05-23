@@ -30,6 +30,22 @@ const imageMap = L.map('image-map', {
   maxBounds,
 })
 
+const demLayer = L.tileLayer('dem/{z}/{x}/{y}.jpg', {
+  attribution: 'ArcticDEM &copy; <a href="https://www.nga.mil/">NGA</a> &amp; <a href="https://www.pgc.umn.edu">PGC</a> 2018',
+  bounds: CORONA_BOUNDS,
+  maxNativeZoom: 15,
+})
+
+const demMap = L.map('dem-map', {
+  layers: [demLayer],
+  center,
+  minZoom,
+  maxZoom,
+  zoom,
+  zoomControl: false,
+  maxBounds,
+})
+
 const gfwLayer = new L.TileLayer(
   'https://storage.googleapis.com/earthenginepartners-hansen/tiles/gfc_v1.6/loss_tree_gain/{z}/{x}/{y}.png', {
     maxNativeZoom: 12,
@@ -61,5 +77,9 @@ for (const cc of crossContainers) {
   cc.innerHTML = CrossSVG
 }
 
+imageMap.sync(demMap)
 imageMap.sync(baseMap)
+demMap.sync(imageMap)
+demMap.sync(baseMap)
 baseMap.sync(imageMap)
+baseMap.sync(demMap)
