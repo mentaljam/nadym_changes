@@ -3,7 +3,7 @@ import {terser} from 'rollup-plugin-terser'
 import commonjs from 'rollup-plugin-commonjs'
 import copy2 from 'rollup-plugin-copy2'
 import gzip from 'rollup-plugin-gzip'
-import html from 'rollup-plugin-bundle-html'
+import html2 from 'rollup-plugin-html2'
 import license from 'rollup-plugin-license'
 import postcss from 'rollup-plugin-postcss'
 import replace from 'rollup-plugin-replace'
@@ -49,13 +49,18 @@ const plugins = [
   }),
   tslint(),
   typescript2(),
-  html({
+  html2({
     template: 'src/index.html',
     externals: [{
       type: 'js',
       file: `https://api-maps.yandex.ru/2.1/?apikey=${yandexKey}&lang=ru_RU`,
       pos: 'before',
     }],
+    minify: {
+      removeComments: true,
+      collapseWhitespace: true,
+      keepClosingSlash: true,
+    },
   }),
   copy2({
     assets: [
