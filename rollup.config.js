@@ -10,7 +10,7 @@ import replace from 'rollup-plugin-replace'
 import resolve from 'rollup-plugin-node-resolve'
 import tslint from 'rollup-plugin-tslint'
 import typescript2 from 'rollup-plugin-typescript2'
-import svgo from 'rollup-plugin-svgo'
+import svgo from 'svgo'
 
 import coronaBounds from './corona_bounds'
 
@@ -31,6 +31,16 @@ const maxBounds = [
   coronaBounds[0].map(c => c - 1),
   coronaBounds[1].map(c => c + 1),
 ]
+
+const svg = () => ({
+  name: 'svgo',
+  transform(code, id) {
+    const optimozer = new svgo()
+    if (id.endsWith('.svg')) {
+      return optimozer.optimize(code).then(({data}) => 'export default ' + JSON.stringify(data))
+    }
+  }
+})
 
 
 const plugins = [
@@ -60,9 +70,7 @@ const plugins = [
       keepClosingSlash: true,
     },
   }),
-  svgo({
-    removeDimensions: false,
-  }),
+  svg(),
   copy2({
     assets: [
       'LICENSE',
