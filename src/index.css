@@ -35,3 +35,11 @@ body {
   pointer-events: none;
   z-index: 999;
 }
+
+/* https://github.com/Leaflet/Leaflet/issues/4686 */
+.leaflet-fade-anim .leaflet-tile {
+  will-change: auto !important;
+}
+.leaflet-zoom-anim .leaflet-zoom-animated {
+  will-change: auto !important;
+}
