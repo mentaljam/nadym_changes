@@ -31,6 +31,9 @@ const maxBounds = [
   coronaBounds[0].map(c => c - 1),
   coronaBounds[1].map(c => c + 1),
 ]
+const geoserverUrl = prodMode ?
+  '/geoserver' :
+  'https://ageoportal.ipos-tmn.ru/geoserver'
 
 const svg = () => ({
   name: 'svgo',
@@ -48,6 +51,7 @@ const plugins = [
     BING_KEY: JSON.stringify(bingKey),
     CORONA_BOUNDS: JSON.stringify(coronaBounds),
     MAX_BOUNDS: JSON.stringify(maxBounds),
+    GEOSERVER_URL: JSON.stringify(geoserverUrl),
   }),
   resolve(),
   commonjs(),

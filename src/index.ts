@@ -16,7 +16,20 @@ const maxZoom = 16
 const zoom = 7
 const maxBounds: L.LatLngBoundsLiteral = MAX_BOUNDS
 
-const imageLayer = L.tileLayer('corona/{z}/{x}/{y}.jpg', {
+// `GEOSERVER_URL` will be concatenated by terser
+const wmtsUrlTmpl = (layer: string) => (GEOSERVER_URL + `/gwc/service/wmts?\
+Service=WMTS&\
+Version=1.0.0&\
+Request=GetTile&\
+Format=image/jpeg&\
+tilematrixset=nadym&\
+TileMatrix=nadym:{z}&\
+TileCol={x}&\
+TileRow={y}&\
+layer=nadym:`
+).concat(layer)
+
+const imageLayer = L.tileLayer(wmtsUrlTmpl('KH_4b_19680821_2m'), {
   attribution: 'Corona KH-4 21.08.1968',
   bounds: CORONA_BOUNDS,
 })
@@ -30,7 +43,7 @@ const imageMap = L.map('image-map', {
   maxBounds,
 })
 
-const demLayer = L.tileLayer('dem/{z}/{x}/{y}.jpg', {
+const demLayer = new L.TileLayer(wmtsUrlTmpl('dem1968'), {
   attribution: 'ArcticDEM &copy; <a href="https://www.nga.mil/">NGA</a> &amp; <a href="https://www.pgc.umn.edu">PGC</a> 2018',
   bounds: CORONA_BOUNDS,
   maxNativeZoom: 15,

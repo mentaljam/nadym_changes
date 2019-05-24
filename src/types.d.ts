@@ -32,6 +32,7 @@ declare namespace L {
 declare const BING_KEY: string
 declare const CORONA_BOUNDS: L.LatLngBoundsLiteral
 declare const MAX_BOUNDS: L.LatLngBoundsLiteral
+declare const GEOSERVER_URL: string
 
 declare module '*.svg' {
   const content: any
