@@ -72,7 +72,7 @@ const baseLayers = {
 }
 
 const baseMap = L.map('base-map', {
-  layers: [gfwLayer],
+  layers: [baseLayers['Bing Maps']],
   center,
   minZoom,
   maxZoom,
