@@ -90,15 +90,18 @@ if (prodMode) {
         output: 'dist/dependencies.txt',
       },
     }),
-    gzip(),
+    gzip({
+      filter: /\.(js|json|css|html)$/,
+    }),
   )
 }
 
 export default {
   input: 'src/index.ts',
   output: {
-    file: 'dist/index.js',
-    format: 'iife',
+    dir: 'dist',
+    format: 'es',
+    entryFileNames: '[name]-[hash].js',
   },
   plugins,
 }
