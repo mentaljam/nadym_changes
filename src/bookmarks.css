@@ -1,0 +1,26 @@
+.nc-control-bm {
+  background: white;
+}
+
+.leaflet-touch .nc-bm-button {
+  font-size: 22px;
+}
+
+.nc-bm-list-container {
+  padding: 0 1em;
+}
+
+.nc-bm-list {
+  list-style: none;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.nc-bm-list button {
+  border: 0;
+  background: none;
+  box-shadow: none;
+  border-radius: 0px;
+  text-align: left;
+  cursor: pointer;
+}
