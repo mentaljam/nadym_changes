@@ -6,7 +6,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "tslint -p .",
     "build": "rollup -c --environment NODE_ENV:production",
-    "build_dev": "rollup -c --environment NODE_ENV:development"
+    "build_dev": "rollup -c --environment NODE_ENV:development",
+    "start": "rollup -c -w --environment NODE_ENV:development"
   },
   "keywords": [
     "forest",
@@ -21,7 +22,7 @@
     "rollup-plugin-commonjs": "^10.0.0",
     "rollup-plugin-copy2": "^0.1.1",
     "rollup-plugin-gzip": "^2.2.0",
-    "rollup-plugin-html2": "^0.1.1",
+    "rollup-plugin-html2": "^0.1.2",
     "rollup-plugin-license": "^0.8.1",
     "rollup-plugin-node-resolve": "^5.0.0",
     "rollup-plugin-postcss": "^2.0.3",
