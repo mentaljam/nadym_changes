@@ -10,11 +10,22 @@ import 'leaflet/dist/leaflet.css'
 
 import './index.css'
 
-const center: L.LatLngTuple = [65.534, 72.941]
+// Constants
+const viewKey = 'nadym_view'
 const minZoom = 5
 const maxZoom = 16
-const zoom = 7
 const maxBounds: L.LatLngBoundsLiteral = MAX_BOUNDS
+
+// Restore view
+interface ILastView {
+  lat: number
+  lng: number
+  zoom: number
+}
+const lastViewJSON = localStorage.getItem(viewKey)
+const lastView: ILastView | null = lastViewJSON && JSON.parse(lastViewJSON)
+const center: L.LatLngTuple = lastView ? [lastView.lat, lastView.lng] : [65.534, 72.941]
+const zoom = lastView ? lastView.zoom : 7
 
 // `GEOSERVER_URL` will be concatenated by terser
 const wmtsUrlTmpl = (layer: string) => (GEOSERVER_URL + `/gwc/service/wmts?\
@@ -96,3 +107,23 @@ demMap.sync(imageMap)
 demMap.sync(baseMap)
 baseMap.sync(imageMap)
 baseMap.sync(demMap)
+
+// Save view
+let viewTimeout: number
+const saveView = () => {
+  if (!imageMap._loaded) {
+    return
+  }
+  const {lat, lng} = imageMap.getCenter()
+  localStorage.setItem(viewKey, JSON.stringify({
+    lat,
+    lng,
+    zoom: imageMap.getZoom(),
+  }))
+}
+imageMap.on('moveend', () => {
+  if (viewTimeout) {
+    clearTimeout(viewTimeout)
+  }
+  viewTimeout = setTimeout(saveView, 1000) as any
+})

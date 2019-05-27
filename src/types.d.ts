@@ -2,6 +2,7 @@
 declare namespace L {
   // tslint:disable-next-line:interface-name
   interface Map {
+    _loaded: boolean
     sync(map: Map): void
   }
 
