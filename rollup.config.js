@@ -99,9 +99,9 @@ if (prodMode) {
 export default {
   input: 'src/index.ts',
   output: {
-    dir: 'dist',
+    dir: 'dist/' + (prodMode ? 'prod' : 'dev'),
     format: 'es',
-    entryFileNames: '[name]-[hash].js',
+    entryFileNames: prodMode ? '[name]-[hash].js' : undefined,
   },
   plugins,
 }
