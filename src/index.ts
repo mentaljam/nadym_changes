@@ -1,14 +1,16 @@
+import 'leaflet/dist/leaflet.css'
+import './index.css'
+
 import L from 'leaflet'
 
 import 'leaflet-plugins/layer/tile/Bing.js'
 import 'leaflet-plugins/layer/tile/Yandex.js'
 import 'leaflet.sync'
 
+import CoordinatesControl from './coordinates'
+
 import CrossSVG from './cross.svg'
 
-import 'leaflet/dist/leaflet.css'
-
-import './index.css'
 
 // Constants
 const viewKey = 'nadym_view'
@@ -53,6 +55,8 @@ const imageMap = L.map('image-map', {
   zoom,
   maxBounds,
 })
+
+imageMap.addControl(new CoordinatesControl())
 
 const demLayer = new L.TileLayer(wmtsUrlTmpl('dem1968'), {
   attribution: 'ArcticDEM &copy; <a href="https://www.nga.mil/">NGA</a> &amp; <a href="https://www.pgc.umn.edu">PGC</a> 2018',
