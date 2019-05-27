@@ -9,6 +9,7 @@ import 'leaflet.sync'
 
 import BookmarksControl from './bookmarks'
 import CoordinatesControl from './coordinates'
+import FitToExtentControl from './fittoextent'
 
 import CrossSVG from './cross.svg'
 
@@ -69,11 +70,12 @@ export default async () => {
     zoom,
     maxBounds,
   })
-  
+
   imageMap
     .addControl(new BookmarksControl(bookmarksLayer))
     .addControl(new CoordinatesControl())
-  
+    .addControl(new FitToExtentControl())
+
   const demLayer = new L.TileLayer(wmtsUrlTmpl('dem1968'), {
     attribution: 'ArcticDEM &copy; <a href="https://www.nga.mil/">NGA</a> &amp; <a href="https://www.pgc.umn.edu">PGC</a> 2018',
     bounds: CORONA_BOUNDS,
