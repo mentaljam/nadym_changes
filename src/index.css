@@ -10,6 +10,11 @@ body {
   align-items: stretch;
 }
 
+#nc-loading {
+  font-size: x-large;
+  margin: auto;
+}
+
 .nc-map {
   flex: 1;
   position: relative;
