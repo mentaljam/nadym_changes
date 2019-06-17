@@ -87,7 +87,7 @@ if (prodMode) {
     terser(),
     license({
       thirdParty: {
-        output: 'dist/dependencies.txt',
+        output: 'dist/prod/dependencies.txt',
       },
     }),
     gzip({
