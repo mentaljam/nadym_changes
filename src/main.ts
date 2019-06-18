@@ -63,6 +63,10 @@ export default async () => {
     weight: 0.8,
     color: 'yellow',
   })
+  const boundsLayer = await geoJSON('nadym_bounds', {
+    fill: false,
+    color: 'brown',
+  })
 
   // Remove the `Loading...` placeholder
   const loading = document.querySelector('#nc-loading')!
@@ -73,7 +77,7 @@ export default async () => {
   }
 
   const imageMap = L.map('image-map', {
-    layers: [imageLayer, bookmarksLayer],
+    layers: [imageLayer, bookmarksLayer, boundsLayer],
     center,
     minZoom,
     maxZoom,
