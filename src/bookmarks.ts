@@ -1,6 +1,8 @@
 import {Feature} from 'geojson'
 import L from 'leaflet'
 
+import BookmarkSVG from './bookmark.svg'
+
 import './bookmarks.css'
 
 
@@ -39,7 +41,7 @@ export default class BookmarksControl<P = any> extends L.Control {
     this.map = map
     this.btn = document.createElement('a')
     this.btn.className = 'nc-bm-button'
-    this.btn.innerText = '★'
+    this.btn.innerHTML = BookmarkSVG
     this.btn.href = '#'
     this.btn.onmouseover = this.handleMouseOver
     this.btn.onclick = L.DomEvent.stop
@@ -60,7 +62,7 @@ export default class BookmarksControl<P = any> extends L.Control {
       L.DomEvent.disableScrollPropagation(this.list)
       this.list.onmouseleave = this.handleMouseLeave
 
-      const title = document.createElement('h4')
+      const title = document.createElement('h3')
       title.textContent = 'Bookmarks'
       this.list.appendChild(title)
 
