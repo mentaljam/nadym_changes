@@ -46,6 +46,8 @@ typeName=nadym%3A` + name)
   return L.geoJSON(json, {style})
 }
 
+const scaleBar = () => new L.Control.Scale({imperial: false})
+
 export default async () => {
   // Restore view
   const lastViewJSON = localStorage.getItem(viewKey)
@@ -87,24 +89,8 @@ export default async () => {
 
   imageMap
     .addControl(new BookmarksControl(bookmarksLayer))
-    .addControl(new CoordinatesControl())
     .addControl(new FitToExtentControl())
-
-  const demLayer = new L.TileLayer(wmtsUrlTmpl('dem1968'), {
-    attribution: 'ArcticDEM &copy; <a href="https://www.nga.mil/">NGA</a> &amp; <a href="https://www.pgc.umn.edu">PGC</a> 2018',
-    bounds: CORONA_BOUNDS,
-    maxNativeZoom: 15,
-  })
-
-  const demMap = L.map('dem-map', {
-    layers: [demLayer],
-    center,
-    minZoom,
-    maxZoom,
-    zoom,
-    zoomControl: false,
-    maxBounds,
-  })
+    .addControl(scaleBar())
 
   const gfwLayer = new L.TileLayer(
     'https://storage.googleapis.com/earthenginepartners-hansen/tiles/gfc_v1.6/loss_tree_gain/{z}/{x}/{y}.png', {
@@ -131,6 +117,27 @@ export default async () => {
   baseMap.addControl(L.control.layers(baseLayers, undefined, {
     collapsed: false,
   }))
+    .addControl(scaleBar())
+
+  const demLayer = new L.TileLayer(wmtsUrlTmpl('dem1968'), {
+    attribution: 'ArcticDEM &copy; <a href="https://www.nga.mil/">NGA</a> &amp; <a href="https://www.pgc.umn.edu">PGC</a> 2018',
+    bounds: CORONA_BOUNDS,
+    maxNativeZoom: 15,
+  })
+
+  const demMap = L.map('dem-map', {
+    layers: [demLayer],
+    center,
+    minZoom,
+    maxZoom,
+    zoom,
+    zoomControl: false,
+    maxBounds,
+  })
+
+  demMap
+    .addControl(scaleBar())
+    .addControl(new CoordinatesControl())
 
   const crossContainers = document.getElementsByClassName('nc-cross')
   for (const cc of crossContainers) {

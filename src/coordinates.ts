@@ -34,7 +34,7 @@ export default class CoordinatesControl extends L.Control {
   private coordinates?: HTMLDivElement
 
   constructor() {
-    super({position: 'bottomleft'})
+    super({position: 'topright'})
   }
 
   public onAdd(map: L.Map) {
