@@ -4,11 +4,23 @@ import L from 'leaflet'
 import './bookmarks.css'
 
 
-const epsg3857toepsg4326 = ({lat, lng}: L.LatLng) => 
-  L.Projection.SphericalMercator.unproject(L.point(lng, lat))
-
 interface IBookmarkProps {
   name: string
+  site_id: number
+}
+
+const getBookmarks = (layer: L.GeoJSON<any>) => {
+  const bookmarks: Array<IBookmarkProps & {lid: string}> = []
+  layer.eachLayer(l => {
+    const {properties: {site_id, name}} = (l as L.GeoJSON<IBookmarkProps>).feature as Feature<any, IBookmarkProps>
+    const lid = String(layer.getLayerId(l))
+    bookmarks.push({site_id, name, lid})
+  })
+  return bookmarks.sort(({site_id: a}, {site_id: b}) => (
+    a < b ? -1 :
+    a > b ?  1 :
+             0
+  ))
 }
 
 export default class BookmarksControl<P = any> extends L.Control {
@@ -45,6 +57,7 @@ export default class BookmarksControl<P = any> extends L.Control {
       this.list = document.createElement('div')
       this.list.className = 'nc-bm-list-container'
       L.DomEvent.disableClickPropagation(this.list)
+      L.DomEvent.disableScrollPropagation(this.list)
       this.list.onmouseleave = this.handleMouseLeave
 
       const title = document.createElement('h4')
@@ -53,11 +66,10 @@ export default class BookmarksControl<P = any> extends L.Control {
 
       const ul = document.createElement('ul')
       ul.className = 'nc-bm-list'
-      this.layer.eachLayer(layer => {
-        const {properties: {name}} = (layer as L.GeoJSON<IBookmarkProps>).feature as Feature<any, IBookmarkProps>
+      getBookmarks(this.layer).forEach(({site_id, name, lid}) =>  {
         const bm = document.createElement('button')
-        bm.innerHTML = '🔍&nbsp;' + name
-        bm.value = String(this.layer.getLayerId(layer))
+        bm.innerHTML = `🔍&nbsp;${site_id}&nbsp;${name}`
+        bm.value = lid
         bm.onclick = this.handleBMClick
         L.DomEvent.disableClickPropagation(bm)
         const li = document.createElement('li')
@@ -67,22 +79,17 @@ export default class BookmarksControl<P = any> extends L.Control {
       this.list.appendChild(ul)
     }
     this.container!.replaceChild(this.list, this.container!.firstChild!)
+    this.list.classList.add('expanded')
   }
 
   private handleMouseLeave = () => {
     this.container!.replaceChild(this.btn!, this.container!.firstChild!)
+    this.list!.classList.remove('expanded')
   }
 
   private handleBMClick = ({currentTarget}: MouseEvent) => {
     const {value} = (currentTarget as HTMLButtonElement)
     const layer = this.layer.getLayer(parseInt(value, 10)) as L.GeoJSON<IBookmarkProps>
-    const bounds = layer.getBounds()
-    const sw = epsg3857toepsg4326(bounds.getSouthWest())
-    const ne = epsg3857toepsg4326(bounds.getNorthEast())
-    const center = epsg3857toepsg4326(bounds.getCenter())
-    this.map!.fitBounds(L.latLngBounds(sw, ne), {
-      animate: true,
-      duration: Math.log10(this.map!.getCenter().distanceTo(center)),
-    })
+    this.map!.fitBounds(layer.getBounds())
   }
 }

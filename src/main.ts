@@ -36,12 +36,15 @@ TileRow={y}&\
 layer=nadym:`
 ).concat(layer)
 
-const bookmarksUrl = GEOSERVER_URL + `/ows?\
-service=WFS&\
+const geoJSON = async (name: string, style: L.PathOptions) => {
+  const reply = await fetch(GEOSERVER_URL + `/nadym/wfs?\
 version=1.0.0&\
 request=GetFeature&\
-typeName=nadym%3Anadym_bookmarks&\
-outputFormat=application%2Fjson`
+outputFormat=application%2Fjson&\
+typeName=nadym%3A` + name)
+  const json = await reply.json()
+  return L.geoJSON(json, {style})
+}
 
 export default async () => {
   // Restore view
@@ -55,9 +58,11 @@ export default async () => {
     bounds: CORONA_BOUNDS,
   })
 
-  const bookmarksReply = await fetch(bookmarksUrl)
-  const bookmarks = await bookmarksReply.json()
-  const bookmarksLayer = L.geoJSON(bookmarks)
+  const bookmarksLayer = await geoJSON('nadym_examples', {
+    fill: false,
+    weight: 0.8,
+    color: 'yellow',
+  })
 
   // Remove the `Loading...` placeholder
   const loading = document.querySelector('#nc-loading')!
