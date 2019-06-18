@@ -1,4 +1,3 @@
-import fs from 'fs'
 import {terser} from 'rollup-plugin-terser'
 import commonjs from 'rollup-plugin-commonjs'
 import copy2 from 'rollup-plugin-copy2'
@@ -10,19 +9,17 @@ import replace from 'rollup-plugin-replace'
 import resolve from 'rollup-plugin-node-resolve'
 import tslint from 'rollup-plugin-tslint'
 import typescript2 from 'rollup-plugin-typescript2'
-import svgo from 'svgo'
+
+import clean from './rollup/clean'
+import svg from './rollup/svg'
+import {readKey} from './rollup/utils'
 
 import coronaBounds from './corona_bounds'
 
 
 const prodMode = process.env.NODE_ENV === 'production'
-
-const readKey = (file) => {
-  if (!fs.existsSync(file)) {
-    throw new Error(`API key file ${file} doesn't exist`)
-  }
-  return fs.readFileSync(file).toString().trim()
-}
+const dir = 'dist/' + (prodMode ? 'prod' : 'dev')
+const names = prodMode ? '[name]-[hash].js' : '[name].js'
 
 const yandexKey = readKey('yandex.txt')
 const bingKey = readKey('bing.txt')
@@ -35,18 +32,8 @@ const geoserverUrl = prodMode ?
   '/geoserver' :
   'https://ageoportal.ipos-tmn.ru/geoserver'
 
-const svg = () => ({
-  name: 'svgo',
-  transform(code, id) {
-    const optimozer = new svgo()
-    if (id.endsWith('.svg')) {
-      return optimozer.optimize(code).then(({data}) => 'export default ' + JSON.stringify(data))
-    }
-  }
-})
-
-
 const plugins = [
+  clean(),
   replace({
     BING_KEY: JSON.stringify(bingKey),
     CORONA_BOUNDS: JSON.stringify(coronaBounds),
@@ -68,7 +55,7 @@ const plugins = [
       file: `https://api-maps.yandex.ru/2.1/?apikey=${yandexKey}&lang=ru_RU`,
       pos: 'before',
     }],
-    minify: {
+    minify: prodMode && {
       removeComments: true,
       collapseWhitespace: true,
       keepClosingSlash: true,
@@ -87,7 +74,7 @@ if (prodMode) {
     terser(),
     license({
       thirdParty: {
-        output: 'dist/prod/dependencies.txt',
+        output: dir + '/dependencies.txt',
       },
     }),
     gzip({
@@ -99,9 +86,10 @@ if (prodMode) {
 export default {
   input: 'src/index.ts',
   output: {
-    dir: 'dist/' + (prodMode ? 'prod' : 'dev'),
+    dir,
     format: 'es',
-    entryFileNames: prodMode ? '[name]-[hash].js' : undefined,
+    entryFileNames: names,
+    chunkFileNames: names,
   },
   plugins,
 }
