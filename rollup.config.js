@@ -55,6 +55,7 @@ const plugins = [
       file: `https://api-maps.yandex.ru/2.1/?apikey=${yandexKey}&lang=ru_RU`,
       pos: 'before',
     }],
+    preload: ['main'],
     minify: prodMode && {
       removeComments: true,
       collapseWhitespace: true,
