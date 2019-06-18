@@ -45,6 +45,12 @@ body {
   z-index: 999;
 }
 
+.nc-marker {
+  font-size: large;
+  color: white;
+  text-shadow: gray 1px 0 3px;
+}
+
 /* https://github.com/Leaflet/Leaflet/issues/4686 */
 .leaflet-fade-anim .leaflet-tile {
   will-change: auto !important;

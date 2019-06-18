@@ -1,3 +1,4 @@
+import {Feature} from 'geojson'
 import L from 'leaflet'
 
 import 'leaflet-plugins/layer/tile/Bing.js'
@@ -15,6 +16,11 @@ interface ILastView {
   lat: number
   lng: number
   zoom: number
+}
+
+interface IBoundProps {
+  name: string
+  s: number
 }
 
 // Constants
@@ -91,6 +97,15 @@ export default async () => {
     .addControl(new BookmarksControl(bookmarksLayer))
     .addControl(new FitToExtentControl())
     .addControl(scaleBar())
+
+  boundsLayer.eachLayer(l => {
+    L.marker((l as L.GeoJSON<IBoundProps>).getBounds().getCenter(), {
+      icon: L.divIcon({
+        className: 'nc-marker',
+        html: ((l as L.GeoJSON<IBoundProps>).feature as Feature<any, IBoundProps>).properties.name,
+      }),
+    }).addTo(imageMap)
+  })
 
   const gfwLayer = new L.TileLayer(
     'https://storage.googleapis.com/earthenginepartners-hansen/tiles/gfc_v1.6/loss_tree_gain/{z}/{x}/{y}.png', {
