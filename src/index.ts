@@ -5,5 +5,8 @@ import './index.css'
 import('./main')
   .then((main) => (main.default || main)())
   .catch(() => {
-    (document.querySelector('#nc-loading') as HTMLDivElement).innerText = 'Internal error'
+    const div = document.querySelector<HTMLDivElement>('#nc-loading')
+    if (div) {
+      div.innerText = 'Internal error'
+    }
   })
