@@ -76,6 +76,23 @@ export default async () => {
     color: 'brown',
   })
 
+  const fireOverlays = await ([
+    [1968, 'yellow'],
+    [1988, 'gold'],
+    [2001, 'goldenrod'],
+    [2016, 'orange'],
+    [2018, 'orangered'],
+  ] as Array<[number, string]>).reduce(async (prev, [year, fillColor]) => {
+    const res = await prev
+    res['Fires ' + year] = await geoJSON('nadym_fire_' + year, {
+      color: 'darkgray',
+      weight: 0.5,
+      fillColor,
+      fillOpacity: 0.8,
+    })
+    return res
+  }, Promise.resolve<{[year: string]: L.GeoJSON}>({}))
+
   // Remove the `Loading...` placeholder
   const loading = document.querySelector('#nc-loading')!
   loading.parentElement!.removeChild(loading)
@@ -129,7 +146,7 @@ export default async () => {
     maxBounds,
   })
 
-  baseMap.addControl(L.control.layers(baseLayers, undefined, {
+  baseMap.addControl(L.control.layers(baseLayers, fireOverlays, {
     collapsed: false,
   }))
     .addControl(scaleBar())
