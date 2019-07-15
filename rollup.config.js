@@ -50,6 +50,9 @@ const plugins = [
   typescript2(),
   html2({
     template: 'src/index.html',
+    meta: {
+      version: process.env.npm_package_version,
+    },
     externals: [{
       type: 'js',
       file: `https://api-maps.yandex.ru/2.1/?apikey=${yandexKey}&lang=ru_RU`,
