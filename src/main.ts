@@ -71,10 +71,13 @@ export default async () => {
     weight: 0.8,
     color: 'yellow',
   })
+  progress.increase()
+
   const boundsLayer = await geoJSON('nadym_bounds', {
     fill: false,
     color: 'brown',
   })
+  progress.increase()
 
   const fireOverlays = await ([
     [1968, 'yellow'],
@@ -90,10 +93,12 @@ export default async () => {
       fillColor,
       fillOpacity: 0.8,
     })
+    progress.increase()
     return res
   }, Promise.resolve<{[year: string]: L.GeoJSON}>({}))
 
   // Remove the `Loading...` placeholder
+  progress.increase()
   const loading = document.querySelector('#nc-loading')!
   loading.parentElement!.removeChild(loading)
   const maps = document.getElementsByClassName('nc-map')
