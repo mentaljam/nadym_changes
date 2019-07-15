@@ -16,6 +16,10 @@
   ],
   "author": "Petr Tsymbarovich <petr@tsymbarovich.ru>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mentaljam/nadym_changes.git"
+  },
   "devDependencies": {
     "@types/leaflet": "^1.4.5",
     "rollup": "^1.17.0",
