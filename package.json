@@ -21,27 +21,27 @@
     "url": "https://github.com/mentaljam/nadym_changes.git"
   },
   "devDependencies": {
-    "@types/leaflet": "^1.4.5",
-    "rollup": "^1.17.0",
-    "rollup-plugin-commonjs": "^10.0.1",
-    "rollup-plugin-copy2": "^0.1.2",
+    "@rollup/plugin-replace": "^2.3.0",
+    "@types/leaflet": "^1.5.7",
+    "rollup": "^1.29.0",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-copy2": "^0.1.3",
     "rollup-plugin-gzip": "^2.2.0",
-    "rollup-plugin-html2": "^0.2.0",
-    "rollup-plugin-license": "^0.9.0",
+    "rollup-plugin-html2": "^0.5.0",
+    "rollup-plugin-license": "^0.13.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-postcss": "^2.0.3",
-    "rollup-plugin-replace": "^2.2.0",
-    "rollup-plugin-terser": "^5.1.1",
+    "rollup-plugin-terser": "^5.2.0",
     "rollup-plugin-tslint": "^0.2.2",
-    "rollup-plugin-typescript2": "^0.22.0",
-    "svgo": "^1.3.0",
-    "tslint": "^5.18.0",
+    "rollup-plugin-typescript2": "^0.25.3",
+    "svgo": "^1.3.2",
+    "tslint": "^5.20.1",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.5.3"
+    "typescript": "^3.7.4"
   },
   "dependencies": {
-    "leaflet": "^1.5.1",
-    "leaflet-plugins": "^3.1.0",
+    "leaflet": "^1.6.0",
+    "leaflet-plugins": "^3.3.1",
     "leaflet.sync": "^0.2.4"
   }
 }
