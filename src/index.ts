@@ -4,16 +4,12 @@ import './index.css'
 import {ProgressBar} from './progressbar'
 
 
-declare global {
-  const progress: ProgressBar
-}
 const progress = new ProgressBar()
-
 
 import('./main')
   .then((main) => {
     progress.increase(20);
-    (main.default || main)()
+    (main.default || main)(progress)
   })
   .catch(() => {
     const div = document.getElementById('nc-loading')

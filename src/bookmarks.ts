@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import {Feature} from 'geojson'
 import L from 'leaflet'
 
@@ -11,8 +12,12 @@ interface IBookmarkProps {
   site_id: number
 }
 
-const getBookmarks = (layer: L.GeoJSON<any>) => {
-  const bookmarks: Array<IBookmarkProps & {lid: string}> = []
+interface IIBookmarkPropsWithLid extends IBookmarkProps {
+  lid: string
+}
+
+const getBookmarks = (layer: L.GeoJSON): IIBookmarkPropsWithLid[] => {
+  const bookmarks: IIBookmarkPropsWithLid[] = []
   layer.eachLayer(l => {
     const {properties: {site_id, name}} = (l as L.GeoJSON<IBookmarkProps>).feature as Feature<any, IBookmarkProps>
     const lid = String(layer.getLayerId(l))
@@ -26,9 +31,9 @@ const getBookmarks = (layer: L.GeoJSON<any>) => {
 }
 
 export default class BookmarksControl<P = any> extends L.Control {
-  private map?: L.Map
+  private map!: L.Map
   private layer!: L.GeoJSON<P>
-  private container?: HTMLDivElement
+  private container!: HTMLDivElement
   private btn?: HTMLAnchorElement
   private list?: HTMLDivElement
 
@@ -37,7 +42,7 @@ export default class BookmarksControl<P = any> extends L.Control {
     this.layer = layer
   }
 
-  public onAdd(map: L.Map) {
+  public onAdd(map: L.Map): HTMLDivElement {
     this.map = map
     this.btn = document.createElement('a')
     this.btn.className = 'nc-bm-button'
@@ -54,7 +59,7 @@ export default class BookmarksControl<P = any> extends L.Control {
     return this.container
   }
 
-  private handleMouseOver = () => {
+  private handleMouseOver = (): void => {
     if (!this.list) {
       this.list = document.createElement('div')
       this.list.className = 'nc-bm-list-container'
@@ -80,18 +85,24 @@ export default class BookmarksControl<P = any> extends L.Control {
       })
       this.list.appendChild(ul)
     }
-    this.container!.replaceChild(this.list, this.container!.firstChild!)
-    this.list.classList.add('expanded')
+    const child = this.container.firstChild
+    if (child) {
+      this.container.replaceChild(this.list, child)
+      this.list.classList.add('expanded')
+    }
   }
 
-  private handleMouseLeave = () => {
-    this.container!.replaceChild(this.btn!, this.container!.firstChild!)
-    this.list!.classList.remove('expanded')
+  private handleMouseLeave = (): void => {
+    const child = this.container.firstChild
+    if (this.btn && this.list && child) {
+      this.container.replaceChild(this.btn, child)
+      this.list.classList.remove('expanded')
+    }
   }
 
-  private handleBMClick = ({currentTarget}: MouseEvent) => {
+  private handleBMClick = ({currentTarget}: MouseEvent): void => {
     const {value} = (currentTarget as HTMLButtonElement)
     const layer = this.layer.getLayer(parseInt(value, 10)) as L.GeoJSON<IBookmarkProps>
-    this.map!.fitBounds(layer.getBounds())
+    this.map.fitBounds(layer.getBounds())
   }
 }

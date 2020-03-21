@@ -4,13 +4,13 @@ import FitToExtentSVG from './fittoextent.svg'
 
 
 export default class FitToExtentControl extends L.Control {
-  private map?: L.Map
+  private map!: L.Map
 
   constructor() {
     super({position: 'topleft'})
   }
 
-  public onAdd(map: L.Map) {
+  public onAdd(map: L.Map): HTMLElement {
     this.map = map
     const btn = document.createElement('a')
     btn.title = 'Zoom to extent'
@@ -26,7 +26,8 @@ export default class FitToExtentControl extends L.Control {
     return container
   }
 
-  private handleClick = () => {
-    this.map!.fitBounds(this.map!.options.maxBounds!)
+  private handleClick = (): void => {
+    const bounds = this.map.options.maxBounds
+    bounds && this.map.fitBounds(bounds)
   }
 }

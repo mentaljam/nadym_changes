@@ -7,7 +7,6 @@ import gzip from 'rollup-plugin-gzip'
 import html2 from 'rollup-plugin-html2'
 import license from 'rollup-plugin-license'
 import postcss from 'rollup-plugin-postcss'
-import tslint from 'rollup-plugin-tslint'
 import typescript2 from 'rollup-plugin-typescript2'
 
 import clean from './rollup/clean'
@@ -46,7 +45,6 @@ const plugins = [
     extract: true,
     minimize: prodMode,
   }),
-  tslint(),
   typescript2(),
   html2({
     template: 'src/index.html',
@@ -64,6 +62,7 @@ const plugins = [
       collapseWhitespace: true,
       keepClosingSlash: true,
     },
+    onlinePath: '.',
   }),
   svg(),
   copy2({

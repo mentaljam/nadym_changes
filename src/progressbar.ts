@@ -17,7 +17,7 @@ export class ProgressBar {
     })
   }
 
-  public increase = (val = 10) => {
+  public increase = (val = 10): void => {
     if (this.active) {
       this.value += val
       this.bar.style.width = this.value + '%'

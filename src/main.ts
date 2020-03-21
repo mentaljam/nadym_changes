@@ -8,6 +8,7 @@ import 'leaflet.sync'
 import BookmarksControl from './bookmarks'
 import CoordinatesControl from './coordinates'
 import FitToExtentControl from './fittoextent'
+import {ProgressBar} from './progressbar'
 
 import CrossSVG from './cross.svg'
 
@@ -30,7 +31,7 @@ const maxZoom = 16
 const maxBounds: L.LatLngBoundsLiteral = MAX_BOUNDS
   
 // `GEOSERVER_URL` will be concatenated by terser
-const wmtsUrlTmpl = (layer: string) => (GEOSERVER_URL + `/gwc/service/wmts?\
+const wmtsUrlTmpl = (layer: string): string => (GEOSERVER_URL + `/gwc/service/wmts?\
 Service=WMTS&\
 Version=1.0.0&\
 Request=GetTile&\
@@ -42,7 +43,7 @@ TileRow={y}&\
 layer=nadym:`
 ).concat(layer)
 
-const geoJSON = async (name: string, style: L.PathOptions) => {
+const geoJSON = async (name: string, style: L.PathOptions): Promise<L.GeoJSON<unknown>> => {
   const reply = await fetch(GEOSERVER_URL + `/nadym/wfs?\
 version=1.0.0&\
 request=GetFeature&\
@@ -52,9 +53,9 @@ typeName=nadym%3A` + name)
   return L.geoJSON(json, {style})
 }
 
-const scaleBar = () => new L.Control.Scale({imperial: false})
+const scaleBar = (): L.Control.Scale => new L.Control.Scale({imperial: false})
 
-export default async () => {
+export default async (progress: ProgressBar): Promise<void> => {
   // Restore view
   const lastViewJSON = localStorage.getItem(viewKey)
   const lastView: ILastView | null = lastViewJSON && JSON.parse(lastViewJSON)
@@ -99,8 +100,8 @@ export default async () => {
 
   // Remove the `Loading...` placeholder
   progress.increase()
-  const loading = document.querySelector('#nc-loading')!
-  loading.parentElement!.removeChild(loading)
+  const loading = document.querySelector('#nc-loading') as Element
+  loading.parentElement && loading.parentElement.removeChild(loading)
   const maps = document.getElementsByClassName('nc-map')
   for (const m of maps) {
     m.removeAttribute('hidden')
@@ -190,7 +191,7 @@ export default async () => {
 
   // Save view
   let viewTimeout: number
-  const saveView = () => {
+  const saveView = (): void => {
     if (!imageMap._loaded) {
       return
     }
@@ -205,6 +206,6 @@ export default async () => {
     if (viewTimeout) {
       clearTimeout(viewTimeout)
     }
-    viewTimeout = setTimeout(saveView, 1000) as any
+    viewTimeout = setTimeout(saveView, 1000)
   })
 }

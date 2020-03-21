@@ -1,0 +1,5 @@
+rollup/*
+dist/*
+src/types.d.ts
+corona_bounds.js
+rollup.config.js

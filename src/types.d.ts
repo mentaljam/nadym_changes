@@ -1,6 +1,4 @@
-// tslint:disable-next-line:no-namespace
 declare namespace L {
-  // tslint:disable-next-line:interface-name
   interface Map {
     _loaded: boolean
     sync(map: Map): void
@@ -24,7 +22,6 @@ declare namespace L {
 		traffic?: boolean
   }
 
-  // tslint:disable-next-line:max-classes-per-file
   class Yandex extends Layer  {
     constructor(type?: YandexMap, options?: IYandexOptions);
   }
