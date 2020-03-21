@@ -55,6 +55,53 @@ typeName=nadym%3A` + name)
 
 const scaleBar = (): L.Control.Scale => new L.Control.Scale({imperial: false})
 
+const loadImageMapLayers = async (map: L.Map, progress: ProgressBar): Promise<void> => {
+  const bookmarks = await geoJSON('nadym_examples', {
+    fill: false,
+    weight: 0.8,
+    color: 'yellow',
+  })
+  map
+    .addLayer(bookmarks)
+    .addControl(new BookmarksControl(bookmarks))
+  progress.increase()
+
+  const bounds = await geoJSON('nadym_bounds', {
+    fill: false,
+    color: 'brown',
+  })
+  map.addLayer(bounds)
+  bounds.eachLayer(l => {
+    L.marker((l as L.GeoJSON<IBoundProps>).getBounds().getCenter(), {
+      icon: L.divIcon({
+        className: 'nc-marker',
+        html: ((l as L.GeoJSON<IBoundProps>).feature as Feature<any, IBoundProps>).properties.name,
+      }),
+    }).addTo(map)
+  })    
+  progress.increase()
+}
+
+const addFireOverlays = async (control: L.Control.Layers, progress: ProgressBar): Promise<void> => {
+  const config: Array<[number, string]> = [
+    [1968, 'yellow'],
+    [1988, 'gold'],
+    [2001, 'goldenrod'],
+    [2016, 'orange'],
+    [2018, 'orangered'],
+  ]
+  for (const [year, fillColor] of config) {
+    const fireLayer = await geoJSON('nadym_fire_' + year, {
+      color: 'darkgray',
+      weight: 0.5,
+      fillColor,
+      fillOpacity: 0.8,
+    })
+    control.addOverlay(fireLayer, 'Fires ' + year)
+    progress.increase()
+  }
+}
+
 export default async (progress: ProgressBar): Promise<void> => {
   // Restore view
   const lastViewJSON = localStorage.getItem(viewKey)
@@ -67,37 +114,6 @@ export default async (progress: ProgressBar): Promise<void> => {
     bounds: CORONA_BOUNDS,
   })
 
-  const bookmarksLayer = await geoJSON('nadym_examples', {
-    fill: false,
-    weight: 0.8,
-    color: 'yellow',
-  })
-  progress.increase()
-
-  const boundsLayer = await geoJSON('nadym_bounds', {
-    fill: false,
-    color: 'brown',
-  })
-  progress.increase()
-
-  const fireOverlays = await ([
-    [1968, 'yellow'],
-    [1988, 'gold'],
-    [2001, 'goldenrod'],
-    [2016, 'orange'],
-    [2018, 'orangered'],
-  ] as Array<[number, string]>).reduce(async (prev, [year, fillColor]) => {
-    const res = await prev
-    res['Fires ' + year] = await geoJSON('nadym_fire_' + year, {
-      color: 'darkgray',
-      weight: 0.5,
-      fillColor,
-      fillOpacity: 0.8,
-    })
-    progress.increase()
-    return res
-  }, Promise.resolve<{[year: string]: L.GeoJSON}>({}))
-
   // Remove the `Loading...` placeholder
   progress.increase()
   const loading = document.querySelector('#nc-loading') as Element
@@ -108,7 +124,7 @@ export default async (progress: ProgressBar): Promise<void> => {
   }
 
   const imageMap = L.map('image-map', {
-    layers: [imageLayer, bookmarksLayer, boundsLayer],
+    layers: [imageLayer],
     center,
     minZoom,
     maxZoom,
@@ -117,18 +133,10 @@ export default async (progress: ProgressBar): Promise<void> => {
   })
 
   imageMap
-    .addControl(new BookmarksControl(bookmarksLayer))
     .addControl(new FitToExtentControl())
     .addControl(scaleBar())
 
-  boundsLayer.eachLayer(l => {
-    L.marker((l as L.GeoJSON<IBoundProps>).getBounds().getCenter(), {
-      icon: L.divIcon({
-        className: 'nc-marker',
-        html: ((l as L.GeoJSON<IBoundProps>).feature as Feature<any, IBoundProps>).properties.name,
-      }),
-    }).addTo(imageMap)
-  })
+  loadImageMapLayers(imageMap, progress)
 
   const gfwLayer = new L.TileLayer(
     'https://storage.googleapis.com/earthenginepartners-hansen/tiles/gfc_v1.6/loss_tree_gain/{z}/{x}/{y}.png', {
@@ -152,10 +160,15 @@ export default async (progress: ProgressBar): Promise<void> => {
     maxBounds,
   })
 
-  baseMap.addControl(L.control.layers(baseLayers, fireOverlays, {
+  const baseMapLayers = L.control.layers(baseLayers, undefined, {
     collapsed: false,
-  }))
+  })
+
+  baseMap
+    .addControl(baseMapLayers)
     .addControl(scaleBar())
+
+  addFireOverlays(baseMapLayers, progress)
 
   const demLayer = new L.TileLayer(wmtsUrlTmpl('dem1968'), {
     attribution: 'ArcticDEM &copy; <a href="https://www.nga.mil/">NGA</a> &amp; <a href="https://www.pgc.umn.edu">PGC</a> 2018',
