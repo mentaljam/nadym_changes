@@ -53,6 +53,9 @@ typeName=nadym%3A` + name)
   return L.geoJSON(json, {style})
 }
 
+const geeUrlTmpl = (layer: string): string =>
+  `https://earthengine.googleapis.com/v1alpha/projects/earthengine-legacy/maps/${layer}/tiles/{z}/{x}/{y}`
+
 const scaleBar = (): L.Control.Scale => new L.Control.Scale({imperial: false})
 
 const loadImageMapLayers = async (map: L.Map, progress: ProgressBar): Promise<void> => {
@@ -170,14 +173,43 @@ export default (progress: ProgressBar): void => {
 
   addFireOverlays(baseMapLayers, progress)
 
-  const demLayer = new L.TileLayer(wmtsUrlTmpl('dem1968'), {
-    attribution: 'ArcticDEM &copy; <a href="https://www.nga.mil/">NGA</a> &amp; <a href="https://www.pgc.umn.edu">PGC</a> 2018',
-    bounds: CORONA_BOUNDS,
+  const customDemLayer = new L.TileLayer(wmtsUrlTmpl('dem1968'), {
+    attribution:   'ArcticDEM &copy; <a href="https://www.nga.mil/">NGA</a> &amp; <a href="https://www.pgc.umn.edu">PGC</a> 2018',
+    bounds:        CORONA_BOUNDS,
     maxNativeZoom: 15,
   })
 
+  const elevationLayer = L.tileLayer(geeUrlTmpl('ab9061c7940d452bed963e4ba00d25f8-fe77f0bb2e05ef7d530aa873865dd345'), {
+    maxNativeZoom: 15,
+  })
+
+  const hillshadeLayer = L.tileLayer(geeUrlTmpl('543faa05cc38092541a83a001f634d16-ded1d0a8cdce622697965b7d23c2f249'), {
+    opacity:       0.45,
+    maxNativeZoom: 15,
+  })
+
+  const arcticDemGroup = L.layerGroup([elevationLayer, hillshadeLayer], {
+    attribution: 'ArcticDEM &copy; <a href="https://www.pgc.umn.edu">PGC</a> &amp; <a href="https://earthengine.google.com/">GEE</a> 2020',
+  })
+
+  const topoLayer = L.tileLayer('https://maps.marshruty.ru/ml.ashx?al=1&i=1&x={x}&y={y}&z={z}', {
+    attribution:   '&copy; <a href="https://www.marshruty.ru">Маршруты.Ру</a> 2005-2020',
+    minNativeZoom: 9,
+    maxNativeZoom: 13,
+  })
+
+  const demLayers = {
+    ArcticDEM:        customDemLayer,
+   'ArcticDEM GEE':   arcticDemGroup,
+   'Topographic map': topoLayer,
+  }
+
+  const demMapLayers = L.control.layers(demLayers, undefined, {
+    collapsed: false,
+  })
+
   const demMap = L.map('dem-map', {
-    layers: [demLayer],
+    layers: [demLayers.ArcticDEM],
     center,
     minZoom,
     maxZoom,
@@ -187,6 +219,7 @@ export default (progress: ProgressBar): void => {
   })
 
   demMap
+    .addControl(demMapLayers)
     .addControl(scaleBar())
     .addControl(new CoordinatesControl())
 
