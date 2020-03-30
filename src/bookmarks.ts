@@ -23,11 +23,7 @@ const getBookmarks = (layer: L.GeoJSON): IIBookmarkPropsWithLid[] => {
     const lid = String(layer.getLayerId(l))
     bookmarks.push({site_id, name, lid})
   })
-  return bookmarks.sort(({site_id: a}, {site_id: b}) => (
-    a < b ? -1 :
-    a > b ?  1 :
-             0
-  ))
+  return bookmarks.sort(({site_id: a}, {site_id: b}) => a - b)
 }
 
 export default class BookmarksControl<P = any> extends L.Control {
