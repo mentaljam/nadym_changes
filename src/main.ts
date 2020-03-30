@@ -102,7 +102,7 @@ const addFireOverlays = async (control: L.Control.Layers, progress: ProgressBar)
   }
 }
 
-export default async (progress: ProgressBar): Promise<void> => {
+export default (progress: ProgressBar): void => {
   // Restore view
   const lastViewJSON = localStorage.getItem(viewKey)
   const lastView: ILastView | null = lastViewJSON && JSON.parse(lastViewJSON)
