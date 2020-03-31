@@ -66,6 +66,10 @@ body {
   text-shadow: gray 1px 0 3px;
 }
 
+.nc-data-link {
+  text-decoration: none;
+}
+
 /* https://github.com/Leaflet/Leaflet/issues/4686 */
 .leaflet-fade-anim .leaflet-tile {
   will-change: auto !important;

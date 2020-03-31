@@ -44,12 +44,14 @@ TileRow={y}&\
 layer=nadym:`
 ).concat(layer)
 
-const geoJSON = async (name: string, options: Partial<L.GeoJSONOptions>): Promise<L.GeoJSON<unknown>> => {
-  const reply = await fetch(GEOSERVER_URL + `/nadym/wfs?\
+const wfsUrlTmpl = (name: string, format: string): string => GEOSERVER_URL + `/nadym/wfs?\
 version=1.0.0&\
 request=GetFeature&\
-outputFormat=application%2Fjson&\
-typeName=nadym%3A` + name)
+outputFormat=${format}&\
+typeName=nadym%3A${name}`
+
+const geoJSON = async (name: string, options: Partial<L.GeoJSONOptions>): Promise<L.GeoJSON<unknown>> => {
+  const reply = await fetch(wfsUrlTmpl(name, 'application%2Fjson'))
   const json = await reply.json()
   return L.geoJSON(json, options)
 }
@@ -152,7 +154,8 @@ const addFireOverlays = async (control: L.Control.Layers, progress: ProgressBar)
     [2018, 'orangered'],
   ]
   for (const [year, fillColor] of config) {
-    const layer = await geoJSON('nadym_fire_' + year, {
+    const layerName = 'nadym_fire_' + year
+    const layer = await geoJSON(layerName, {
       style: {
         color: 'darkgray',
         weight: 0.5,
@@ -161,7 +164,7 @@ const addFireOverlays = async (control: L.Control.Layers, progress: ProgressBar)
       },
     })
     layer.on('add', bringToBack)
-    control.addOverlay(layer, 'Fires ' + year)
+    control.addOverlay(layer, `Fires ${year} (<a class="nc-data-link" href="${wfsUrlTmpl(layerName, 'SHAPE-ZIP')}">download</a>)`)
     progress.increase(8)
   }
 }
