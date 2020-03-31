@@ -103,13 +103,19 @@ const referenceShape = (change: string): L.ShapeMarkerOptions['shape'] => {
   }
 }
 
-const addReferencePoints = async (control: L.Control.Layers, progress: ProgressBar): Promise<void> => {
+const loadLayerFactory = (name: string) => function(this: L.GeoJSON): void {
+  fetch(wfsUrlTmpl(name, 'application%2Fjson'))
+    .then(res => res.json())
+    .then(json => this.addData(json))
+}
+
+const addReferencePoints = (control: L.Control.Layers, progress: ProgressBar): void => {
   const config: Array<[string, string, string]> = [
     ['Tundra',     'reference_tundra',     'blue'],
     ['Burnt area', 'reference_burnt_area', 'red'],
   ]
   for (const [displayName, layerName, fillColor] of config) {
-    const layer = await geoJSON(layerName, {
+    const layer = L.geoJSON(undefined, {
       pointToLayer({properties: {Change}}, latlng) {
         return L.shapeMarker(latlng, {
           color: 'black',
@@ -121,6 +127,7 @@ const addReferencePoints = async (control: L.Control.Layers, progress: ProgressB
         })
       },
     })
+    layer.once('add', loadLayerFactory(layerName))
     layer.bindPopup('', {
       closeButton: false,
     })
@@ -145,7 +152,7 @@ function bringToBack(this: L.GeoJSON): void {
   this.bringToBack()
 }
 
-const addFireOverlays = async (control: L.Control.Layers, progress: ProgressBar): Promise<void> => {
+const addFireOverlays = (control: L.Control.Layers, progress: ProgressBar): void => {
   const config: Array<[number, string]> = [
     [1968, 'yellow'],
     [1988, 'gold'],
@@ -155,7 +162,7 @@ const addFireOverlays = async (control: L.Control.Layers, progress: ProgressBar)
   ]
   for (const [year, fillColor] of config) {
     const layerName = 'nadym_fire_' + year
-    const layer = await geoJSON(layerName, {
+    const layer = L.geoJSON(undefined, {
       style: {
         color: 'darkgray',
         weight: 0.5,
@@ -163,15 +170,11 @@ const addFireOverlays = async (control: L.Control.Layers, progress: ProgressBar)
         fillOpacity: 0.8,
       },
     })
+    layer.once('add', loadLayerFactory(layerName))
     layer.on('add', bringToBack)
     control.addOverlay(layer, `Fires ${year} (<a class="nc-data-link" href="${wfsUrlTmpl(layerName, 'SHAPE-ZIP')}">download</a>)`)
     progress.increase(8)
   }
-}
-
-const loadOverlays = async (control: L.Control.Layers, progress: ProgressBar): Promise<void> => {
-  await addReferencePoints(control, progress)
-  await addFireOverlays(control, progress)
 }
 
 export default (progress: ProgressBar): void => {
@@ -240,7 +243,8 @@ export default (progress: ProgressBar): void => {
     .addControl(baseMapLayers)
     .addControl(scaleBar())
 
-  loadOverlays(baseMapLayers, progress)
+  addReferencePoints(baseMapLayers, progress)
+  addFireOverlays(baseMapLayers, progress)
 
   const customDemLayer = new L.TileLayer(wmtsUrlTmpl('dem1968'), {
     attribution:   'ArcticDEM &copy; <a href="https://www.nga.mil/">NGA</a> &amp; <a href="https://www.pgc.umn.edu">PGC</a> 2018',
