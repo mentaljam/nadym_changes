@@ -2,6 +2,7 @@ dependencies:
   geojson: 0.5.0
   leaflet: 1.6.0
   leaflet-plugins: 3.3.1
+  leaflet-svg-shape-markers: 1.2.0
   leaflet.sync: 0.2.4
 devDependencies:
   '@rollup/plugin-commonjs': 11.0.2_rollup@2.1.0
@@ -1431,6 +1432,10 @@ packages:
     dev: false
     resolution:
       integrity: sha512-LiB9waFn1NVdiqLUffKUr59k8qoPv/41U7cw4fYBK82mZu672hTlEzUzgSpLNE6JN1O5ruWVrjUsX83MQZxEGA==
+  /leaflet-svg-shape-markers/1.2.0:
+    dev: false
+    resolution:
+      integrity: sha512-jUxKN+ib8EKRTKSvRyLS9IwnbIDNl+TRdEqP1ypVUqQl+7de03exQDyPeHQl96n+blZP+LuMNUlKjrG36ABuJw==
   /leaflet.sync/0.2.4:
     dev: false
     resolution:
@@ -2891,6 +2896,7 @@ specifiers:
   geojson: ^0.5.0
   leaflet: ^1.6.0
   leaflet-plugins: ^3.3.1
+  leaflet-svg-shape-markers: ^1.2.0
   leaflet.sync: ^0.2.4
   rollup: ^2.1.0
   rollup-plugin-copy2: ^0.1.3

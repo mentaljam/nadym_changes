@@ -44,6 +44,7 @@
     "geojson": "^0.5.0",
     "leaflet": "^1.6.0",
     "leaflet-plugins": "^3.3.1",
+    "leaflet-svg-shape-markers": "^1.2.0",
     "leaflet.sync": "^0.2.4"
   }
 }

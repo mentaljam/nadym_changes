@@ -4,6 +4,7 @@ import L from 'leaflet'
 import 'leaflet-plugins/layer/tile/Bing.js'
 import 'leaflet-plugins/layer/tile/Yandex.js'
 import 'leaflet.sync'
+import 'leaflet-svg-shape-markers'
 
 import BookmarksControl from './bookmarks'
 import CoordinatesControl from './coordinates'
@@ -29,7 +30,7 @@ const viewKey = 'nadym_view'
 const minZoom = 5
 const maxZoom = 16
 const maxBounds: L.LatLngBoundsLiteral = MAX_BOUNDS
-  
+
 // `GEOSERVER_URL` will be concatenated by terser
 const wmtsUrlTmpl = (layer: string): string => (GEOSERVER_URL + `/gwc/service/wmts?\
 Service=WMTS&\
@@ -43,14 +44,14 @@ TileRow={y}&\
 layer=nadym:`
 ).concat(layer)
 
-const geoJSON = async (name: string, style: L.PathOptions): Promise<L.GeoJSON<unknown>> => {
+const geoJSON = async (name: string, options: Partial<L.GeoJSONOptions>): Promise<L.GeoJSON<unknown>> => {
   const reply = await fetch(GEOSERVER_URL + `/nadym/wfs?\
 version=1.0.0&\
 request=GetFeature&\
 outputFormat=application%2Fjson&\
 typeName=nadym%3A` + name)
   const json = await reply.json()
-  return L.geoJSON(json, {style})
+  return L.geoJSON(json, options)
 }
 
 const geeUrlTmpl = (layer: string): string =>
@@ -60,9 +61,11 @@ const scaleBar = (): L.Control.Scale => new L.Control.Scale({imperial: false})
 
 const loadImageMapLayers = async (map: L.Map, progress: ProgressBar): Promise<void> => {
   const bookmarks = await geoJSON('nadym_examples', {
-    fill: false,
-    weight: 0.8,
-    color: 'yellow',
+    style: {
+      fill: false,
+      weight: 0.8,
+      color: 'yellow',
+    },
   })
   map
     .addLayer(bookmarks)
@@ -70,8 +73,10 @@ const loadImageMapLayers = async (map: L.Map, progress: ProgressBar): Promise<vo
   progress.increase()
 
   const bounds = await geoJSON('nadym_bounds', {
-    fill: false,
-    color: 'brown',
+    style: {
+      fill: false,
+      color: 'brown',
+    },
   })
   map.addLayer(bounds)
   bounds.eachLayer(l => {
@@ -85,6 +90,59 @@ const loadImageMapLayers = async (map: L.Map, progress: ProgressBar): Promise<vo
   progress.increase()
 }
 
+const referenceShape = (change: string): L.ShapeMarkerOptions['shape'] => {
+  switch (change) {
+    case 'Dense forest':
+      return 'square'
+    case 'Sparse forest':
+      return 'triangle'
+    default:
+      return 'circle'
+  }
+}
+
+const addReferencePoints = async (control: L.Control.Layers, progress: ProgressBar): Promise<void> => {
+  const config: Array<[string, string, string]> = [
+    ['Tundra',     'reference_tundra',     'blue'],
+    ['Burnt area', 'reference_burnt_area', 'red'],
+  ]
+  for (const [displayName, layerName, fillColor] of config) {
+    const layer = await geoJSON(layerName, {
+      pointToLayer({properties: {Change}}, latlng) {
+        return L.shapeMarker(latlng, {
+          color: 'black',
+          fillColor,
+          fillOpacity: 1,
+          radius: 7,
+          weight: 1,
+          shape: referenceShape(Change),
+        })
+      },
+    })
+    layer.bindPopup('', {
+      closeButton: false,
+    })
+    layer.on('mouseover', function (
+      this: L.GeoJSON,
+      {
+        latlng,
+        sourceTarget: {feature: {properties: {Change}}},
+      }: L.LeafletMouseEvent) {
+      this.setPopupContent(Change)
+      this.openPopup(latlng)
+    })
+    layer.on('mouseout', function (this: L.GeoJSON) {
+      this.closePopup()
+    })
+    control.addOverlay(layer, 'Reference – ' + displayName)
+    progress.increase(5)
+  }
+}
+
+function bringToBack(this: L.GeoJSON): void {
+  this.bringToBack()
+}
+
 const addFireOverlays = async (control: L.Control.Layers, progress: ProgressBar): Promise<void> => {
   const config: Array<[number, string]> = [
     [1968, 'yellow'],
@@ -94,15 +152,23 @@ const addFireOverlays = async (control: L.Control.Layers, progress: ProgressBar)
     [2018, 'orangered'],
   ]
   for (const [year, fillColor] of config) {
-    const fireLayer = await geoJSON('nadym_fire_' + year, {
-      color: 'darkgray',
-      weight: 0.5,
-      fillColor,
-      fillOpacity: 0.8,
+    const layer = await geoJSON('nadym_fire_' + year, {
+      style: {
+        color: 'darkgray',
+        weight: 0.5,
+        fillColor,
+        fillOpacity: 0.8,
+      },
     })
-    control.addOverlay(fireLayer, 'Fires ' + year)
-    progress.increase()
+    layer.on('add', bringToBack)
+    control.addOverlay(layer, 'Fires ' + year)
+    progress.increase(8)
   }
+}
+
+const loadOverlays = async (control: L.Control.Layers, progress: ProgressBar): Promise<void> => {
+  await addReferencePoints(control, progress)
+  await addFireOverlays(control, progress)
 }
 
 export default (progress: ProgressBar): void => {
@@ -171,7 +237,7 @@ export default (progress: ProgressBar): void => {
     .addControl(baseMapLayers)
     .addControl(scaleBar())
 
-  addFireOverlays(baseMapLayers, progress)
+  loadOverlays(baseMapLayers, progress)
 
   const customDemLayer = new L.TileLayer(wmtsUrlTmpl('dem1968'), {
     attribution:   'ArcticDEM &copy; <a href="https://www.nga.mil/">NGA</a> &amp; <a href="https://www.pgc.umn.edu">PGC</a> 2018',

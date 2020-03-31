@@ -25,6 +25,17 @@ declare namespace L {
   class Yandex extends Layer  {
     constructor(type?: YandexMap, options?: IYandexOptions);
   }
+
+  interface ShapeMarkerOptions extends PathOptions {
+    radius?: number
+    shape?: 'diamond' | 'square' | 'triangle' | 'triangle-up' | 'triangle-down'| 'circle' | 'x'
+  }
+
+  class ShapeMarker extends Path {
+    constructor(latlng: LatLngExpression, options?: ShapeMarkerOptions)
+  }
+
+  function shapeMarker(latlng: LatLngExpression, options?: ShapeMarkerOptions): ShapeMarker
 }
 
 declare const BING_KEY: string
